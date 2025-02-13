@@ -38,7 +38,7 @@ def login():
         password = st.text_input('Enter password: ', type='password', placeholder="Enter Your Password")
         
         if st.button("Login"):
-            if username == 'j' and password == 'j':
+            if (username in ['j', 'J']) and (password in ['j', 'J'])
                 st.session_state.user = {
                     "role": "Admin",
                     "name": "Admin"
