@@ -11,7 +11,7 @@ import threading
 # Email credentials
 SENDER_EMAIL = "scomcoaching@gmail.com"
 SENDER_PASSWORD = "xgbf hqum tlys gweq"
-RECEIVER_EMAIL = "varungirish63729802@gmail.com"
+RECEIVER_EMAIL = "jean-toms@chai-india.org"
 
 # Initialize database
 def init_db():
