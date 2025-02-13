@@ -300,7 +300,7 @@ def admin_page():
                     st.metric(label="Consultations", value=n)
                 
                 with col2:
-                    st.header("Total Number of Sisters")
+                    st.header("Total No. of Sisters")
                     st.metric(label="Nurses", value=sn)
                 
                 with st.expander("Consultation Status"):
