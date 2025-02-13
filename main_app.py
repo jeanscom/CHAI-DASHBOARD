@@ -283,7 +283,7 @@ def admin_page():
         if response.status_code == 200:
             with open("dataset.csv", "wb") as file:
                 file.write(response.content)
-            st.success("File downloaded and renamed to dataset.csv successfully!")
+            
 
     def tracking():
             """Tracking details from the dataset."""
