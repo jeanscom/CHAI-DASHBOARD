@@ -1,12 +1,9 @@
 import streamlit as st
 import sqlite3
-import webbrowser
-
 
 # Connect to SQLite database
 def get_connection():
-    conn = sqlite3.connect('chai.db')
-    return conn
+    return sqlite3.connect('chai.db')
 
 # Create table if it doesn't exist
 def create_table():
@@ -45,10 +42,10 @@ def list_records():
 # Delete a record from the database
 def delete_record(record_id):
     conn = get_connection()
-    cursor = get_connection().cursor()
+    cursor = conn.cursor()
     cursor.execute('DELETE FROM openlink WHERE id = ?', (record_id,))
-    cursor.connection.commit()
-    cursor.connection.close()
+    conn.commit()
+    conn.close()
 
 # Modify a record in the database
 def modify_record(record_id, name, linkname, username, password):
@@ -76,27 +73,26 @@ def search_record(record_id):
     conn.close()
     return record
 
-# Open a link by name
-def open_link(linkname):
-    webbrowser.open_new_tab(linkname)
+# Open a link by name using HTML
 
+def open_link_html(linkname):
+    st.markdown(f'<a href="{linkname}" target="_blank">Open Link</a>', unsafe_allow_html=True)
 
 # Streamlit app interface
 def open_shortcuts():
     st.subheader('Openlink Records')
     records = list_records()
     for record in records:
-            st.write(f'Name: {record[1]}')
+        with st.expander(record[1]):
             st.write(f'Username: {record[3]}')
             st.write(f'Password: {record[4]}')
-            if st.button(f'Open {record[1]}', key=record[0]):
-                open_link(record[2])
-        
+            open_link_html(record[2])
+
 def shortcut_menu():
     create_table()
     st.title('Openlink Manager')
 
-    menu = ['Add', 'List', 'Delete', 'Modify', 'Search', 'Openlink']
+    menu = ['Add', 'List', 'Delete', 'Modify', 'Search']
     choice = st.sidebar.selectbox('Menu', menu)
 
     if choice == 'Add':
@@ -138,10 +134,10 @@ def shortcut_menu():
                     submit_button = st.form_submit_button(label='Update Record')
                     
                     if submit_button:
-                        if name and linkname:  # Basic validation
+                        if name and linkname:
                             if modify_record(record_id, name, linkname, username, password):
                                 st.success('Record modified successfully!')
-                                st.rerun()  # Refresh the page to show updated data
+                                st.rerun()
                         else:
                             st.error('Name and Link Name are required fields!')
             else:
