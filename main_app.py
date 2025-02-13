@@ -653,7 +653,7 @@ def display_sister(reg):
        
     else:
         st.header("LIST OF ENROLLED SISTERS")
-        query = "SELECT * FROM sister"
+        query = "SELECT * FROM sisters"
         # Using params argument separately
         df = pd.read_sql_query(query, con,)
            
