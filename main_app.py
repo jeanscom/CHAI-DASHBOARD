@@ -393,7 +393,7 @@ def admin_page():
         st.write("Welcome to Admin")
         admin_option = st.sidebar.selectbox(
             "Choose an action:",
-            ["Manage Users","Manage Data","Manage Sisters", "Manage Shortcuts", "Manage Reminder"])
+            ["Manage Users","Manage Data","Manage Sisters", "Manage Shortcuts"])
             
         if admin_option == "Manage Data":
             Data_action = st.sidebar.selectbox("Manage Data :", ["DB Commands","Delete Files","Add Folders","Delete Folders"])
@@ -600,7 +600,8 @@ def user_page():
     elif user_option=="sister":
             reg=st.session_state.user.get("ru")
             display_sister(reg)
-
+    elif user_option=="Change Password":
+            change_password(email)
 def display_sister(reg):
     
     con = sqlite3.connect("chai.db")
@@ -662,36 +663,5 @@ def display_sister(reg):
         
     con.close()
 
-def change_password(email):
-    con = sqlite3.connect("chai.db")
-    cursor = con.cursor()
 
-    # Fetch the current password for the user
-    cursor.execute("SELECT password FROM users WHERE email = ?", (email,))
-    result = cursor.fetchone()
-    email=result[3]
-
-    if result:
-        current_password = result[0]
-
-        # Input for old password
-        old_password = st.text_input("Enter your old password", type="password")
-
-        if st.button("Verify Old Password"):
-            if old_password == current_password:
-                # Input for new password
-                new_password = st.text_input("Enter your new password", type="password")
-
-                if st.button("Change Password"):
-                    # Update the password in the database
-                    cursor.execute("UPDATE users SET password = ? WHERE email = ?", (new_password, email))
-                    con.commit()
-                    st.success("Password changed successfully!")
-            else:
-                st.error("Old password is incorrect.")
-    else:
-        st.error("User not found.")
-
-    con.close()
- 
 login()
