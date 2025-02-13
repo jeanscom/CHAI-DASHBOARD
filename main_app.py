@@ -287,38 +287,46 @@ def admin_page():
 
     def tracking():
             """Tracking details from the dataset."""
-            try:
-                if st.button("Download Today's File"):
-                    download_file()
-
+            try:    
                 df = pd.read_csv("dataset.csv")
                 n = len(df) - 1
-                st.header(f"Total Number of Consultation {n}")
                 no_of_sister = df["Nurse Name"].unique()
                 sn = len(no_of_sister)
-
-                st.header(f"Total Number of Sister {sn}")
-                st.header("Consultation Status")
-                df2 = df["Status_Final"].groupby(df["Status_Final"]).count()
-                st.write(df2)
-                st.header("Doctors Consultation Status")
-                status_count = df.groupby([df["doctorName"], df["Status_Final"]]).size().unstack(fill_value=0)
-                status_count = status_count.reset_index().rename_axis(None, axis=1)
-                st.write(status_count)
-                st.header("Regional Wise Status")
-                reg_count = df["RegionalUnit"].groupby(df["RegionalUnit"]).count()
-                st.write(reg_count)
-                st.header("Sister Nurse status")
-                df = df.rename(columns={"Nurse Name": "NurseName"})
-                sister_count = df["NurseName"].groupby(df["NurseName"]).count()
-                st.write(sister_count)
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.header("Total Consultation")
+                    st.metric(label="Consultations", value=n)
+                
+                with col2:
+                    st.header("Total Number of Sisters")
+                    st.metric(label="Nurses", value=sn)
+                
+                with st.expander("Consultation Status"):
+                    df2 = df["Status_Final"].groupby(df["Status_Final"]).count()
+                    st.write(df2)
+                
+                with st.expander("Doctors Consultation Status"):
+                    status_count = df.groupby([df["doctorName"], df["Status_Final"]]).size().unstack(fill_value=0)
+                    status_count = status_count.reset_index().rename_axis(None, axis=1)
+                    st.write(status_count)
+                
+                with st.expander("Regional Wise Status"):
+                    reg_count = df["RegionalUnit"].groupby(df["RegionalUnit"]).count()
+                    st.write(reg_count)
+                
+                with st.expander("Sister Nurse Status"):
+                    df = df.rename(columns={"Nurse Name": "NurseName"})
+                    sister_count = df["NurseName"].groupby(df["NurseName"]).count()
+                    st.write(sister_count)
             except Exception as e:
+        
                 st.error(f"Error: {e}")
     def doctor_live():
         url = "https://champs.billionlives.in:8000/api/getAllOnlineCounsellorsApi/5f05ce8de3c290416ba40805"
         response = requests.get(url)
         
-
     # Check if the request was successful (status code 200)
         if response.status_code == 200:
             # Parse the response as JSON
@@ -344,6 +352,7 @@ def admin_page():
         dash.dashboard()
 
     elif main_option=="Daily Tracking":
+        download_file()
         tracking()
 
     elif main_option=="Doctor Live":
@@ -515,7 +524,50 @@ def user_page():
         st.rerun()
     st.header("CHAI Tele Medicine Dashboard")
     user_option=st.sidebar.selectbox("Select ",["Profile","Dashboard","sister","Change Password"])
-    
+    email = st.session_state.user.get("email")
+
+    def change_password(email):
+        con = sqlite3.connect("chai.db")
+        cursor = con.cursor()
+
+        # Fetch the current password for the user
+        cursor.execute("SELECT password FROM users WHERE email = ?", (email,))
+        result = cursor.fetchone()
+
+        if result:
+            current_password = result[0]
+
+            # Input for old password
+            old_password = st.text_input("Enter your old password", type="password")
+
+            # Initialize session state for verification
+            if "verified" not in st.session_state:
+                st.session_state.verified = False
+
+            if st.button("Verify Old Password"):
+                if old_password == current_password:
+                    st.session_state.verified = True
+                    st.success("Old password verified! Enter new password below.")
+                else:
+                    st.session_state.verified = False
+                    st.error("Old password is incorrect.")
+
+            # If verified, allow new password input
+            if st.session_state.verified:
+                new_password = st.text_input("Enter your new password", type="password")
+
+                if st.button("Change Password"):
+                    if new_password:
+                        cursor.execute("UPDATE users SET password = ? WHERE email = ?", (new_password, email))
+                        con.commit()
+                        st.success("Password changed successfully!")
+                        st.session_state.verified = False  # Reset verification state
+                    else:
+                        st.error("New password cannot be empty.")
+        else:
+            st.error("User not found.")
+        con.close()
+        
     def display_user_profile():
         # Retrieve user details from the database
         email = st.session_state.user.get("email")
