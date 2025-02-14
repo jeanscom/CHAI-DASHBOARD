@@ -82,8 +82,12 @@ def open_link_html(linkname):
 def open_shortcuts():
     st.subheader('Openlink Records')
     records = list_records()
+    rec = []
     for record in records:
-        with st.expander(record[1]):
+        rec.append(record[1])
+    r=st.sidebar.selectbox('Choose the app', rec)
+    for record in records:
+        if record[1]==r:
             st.write(f'Username: {record[3]}')
             st.write(f'Password: {record[4]}')
             open_link_html(record[2])
