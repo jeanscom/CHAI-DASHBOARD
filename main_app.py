@@ -14,6 +14,8 @@ import open_linkapp as openapp
 import Sql_manage as sqm
 import reminder as rem
 import rpodash as rp
+import dbcommand as dc
+
 
 # st.set_page_config(
 #     page_title="Chai Tele Medicine Dashboard",
@@ -396,9 +398,11 @@ def admin_page():
             ["Manage Users","Manage Data","Manage Sisters", "Manage Shortcuts"])
             
         if admin_option == "Manage Data":
-            Data_action = st.sidebar.selectbox("Manage Data :", ["DB Commands","Delete Files","Add Folders","Delete Folders"])
+            Data_action = st.sidebar.selectbox("Manage Data :", ["Query Executor","DB Commands",])
             if Data_action == "DB Commands":
                 sqm.db_command() 
+            elif Data_action == "Query Executor":
+                dc.query_executor()
         elif admin_option == "Manage Users":
             
             def list_users():
