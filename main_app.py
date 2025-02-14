@@ -268,7 +268,7 @@ def admin_page():
             n = export_to_sql(csv_file_path)
             
             # Now run sqlite_to_excel
-            sqlite_to_excel()
+            #sqlite_to_excel()
             
             st.success("File downloaded and exported to Database successfully!")
             st.write(f"{n} Datas exported successfully!")
